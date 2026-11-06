@@ -121,11 +121,13 @@
 
   #hint{
     position:absolute; z-index:6; left:50%; bottom:calc(104px + env(safe-area-inset-bottom)); transform:translateX(-50%);
-    font:500 10px/1 var(--sans); letter-spacing:.34em; text-transform:uppercase; color:#d8cdea; opacity:.7; white-space:nowrap;
-    animation:pulse 1.8s ease-in-out infinite; pointer-events:none; transition:opacity .6s;
+    font:600 12px/1 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:#2a1606; white-space:nowrap;
+    background:linear-gradient(180deg,#ffd98a,#f0a93c); padding:10px 18px; border-radius:99px;
+    box-shadow:0 0 0 0 rgba(255,200,100,.55); animation:nudge 1.6s ease-in-out infinite; pointer-events:none; transition:opacity .5s;
   }
   #hint.off{ opacity:0; animation:none; }
-  @keyframes pulse{ 50%{ opacity:.3; } }
+  #hint.end{ background:rgba(255,255,255,.14); color:#fff2d6; animation:none; }
+  @keyframes nudge{ 50%{ transform:translateX(calc(-50% + 5px)); box-shadow:0 0 0 10px rgba(255,200,100,0); } }
   #back{ position:absolute; z-index:7; left:8px; bottom:calc(100px + env(safe-area-inset-bottom)); border:0; background:none; color:#cfc4e2; font:400 22px/1 var(--sans); padding:10px 14px; opacity:.55; }
   #back[hidden]{ display:none; }
 
@@ -280,7 +282,7 @@
   </section>
 
   <div id="diyas"></div>
-  <div id="hint">Tap to continue</div>
+  <div id="hint" class="off"></div>
   <button id="back" type="button" aria-label="Previous" hidden>‹</button>
 </div>
 
@@ -418,8 +420,15 @@
     bars.forEach((b, k) => b.classList.toggle("done", k <= i));
     cur = i;
     $("#back").hidden = i === 0;
-    $("#hint").classList.toggle("off", i > 1);
     const s = slides[i];
+    const hint = $("#hint"), last = i === slides.length - 1;
+    hint.classList.add("off");
+    clearTimeout(go.t);
+    go.t = setTimeout(() => {
+      hint.textContent = last ? "The end ♥" : `Tap for next  ›   ${i + 1}/${slides.length}`;
+      hint.classList.toggle("end", last);
+      hint.classList.remove("off");
+    }, 600 + s.querySelectorAll(".ln").length * 900);
     if (s.dataset.fx === "burst") show(5);
     const x = s.hasAttribute("data-xmas");
     document.body.classList.toggle("xmas", x);
